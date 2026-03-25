@@ -38,7 +38,7 @@ Thumbs.db
 .cache/
 
 # Linux binaries (optional if you rebuild each time)
-speedtest_gui
+speedtest_trigger_gui
 
 # Windows binaries (optional)
 *.exe

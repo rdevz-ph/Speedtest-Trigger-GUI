@@ -12,12 +12,14 @@ def main():
         if os.path.exists(folder):
             shutil.rmtree(folder)
 
-    spec_file = "speedtest_gui.spec"
+    spec_file = "speedtest_trigger_gui.spec"
     if os.path.exists(spec_file):
         os.remove(spec_file)
 
     data_sep = ";" if os.name == "nt" else ":"
-    output_name = "speedtest_trigger_gui.exe" if os.name == "nt" else "speedtest_gui"
+    output_name = (
+        "speedtest_trigger_gui.exe" if os.name == "nt" else "speedtest_trigger_gui"
+    )
 
     cmd = [
         sys.executable,
