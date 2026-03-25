@@ -1,0 +1,44 @@
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.envrc/
+
+# Distribution / packaging
+build/
+dist/
+*.spec
+
+# PyInstaller temp files
+*.manifest
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Tkinter / runtime (optional)
+*.sqlite3
+
+# Cache
+.cache/
+
+# Linux binaries (optional if you rebuild each time)
+speedtest_gui
+
+# Windows binaries (optional)
+*.exe
