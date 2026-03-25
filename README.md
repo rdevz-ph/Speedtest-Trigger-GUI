@@ -2,7 +2,7 @@
 
 A lightweight desktop tool designed to help maintain stable internet performance by periodically checking your connection using a fast ISP, server, and ping check.
 
-> **Note**  
+> [!NOTE]
 > This tool helps maintain your internet speed at its peak, especially in cases where performance drops when no active speed test is running (which may indicate ISP throttling).
 
 Built with Python and Tkinter, it serves as a lightweight alternative to running Speedtest in a web browser.
