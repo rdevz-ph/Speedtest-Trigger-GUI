@@ -1,11 +1,11 @@
 # Speedtest Trigger GUI
 
-A lightweight desktop tool designed to help maintain stable internet performance by periodically checking your connection using a fast ISP, server, and ping check.
+A lightweight desktop tool designed to help maintain stable internet performance by periodically running controlled speed test triggers or lightweight connection checks.
 
 > [!NOTE]
-> This tool helps maintain your internet speed at its peak, especially in cases where performance drops when no active speed test is running (which may indicate ISP throttling).
+> This tool helps maintain your internet speed at its peak, especially in cases where performance drops when no active traffic or speed test is detected (common with ISP throttling behavior).
 
-Built with Python and Tkinter, it serves as a lightweight alternative to running Speedtest in a web browser.
+Built with Python and Tkinter, it serves as a lightweight alternative to running Speedtest in a web browser while giving you control over bandwidth usage.
 
 ---
 
@@ -17,21 +17,52 @@ Built with Python and Tkinter, it serves as a lightweight alternative to running
 
 ## Features
 
-- Fast connection check (no download or upload test)
+- Multiple test modes:
+  - Full test (download + upload)
+  - Download only
+  - Upload only
+  - Checker mode (ISP, server, and ping only)
 - Automatic loop with configurable interval (e.g., every 30 seconds)
 - Displays:
   - Current ISP (Telco)
   - Best server
   - Ping
+  - Mode
+  - Download result
+  - Upload result
+  - Overall result status
 - Start and stop controls
+- Real-time log output
 - Lightweight GUI with minimal resource usage
 - Fully self-contained application
+
+---
+
+## Test Modes
+
+The application allows flexible control over bandwidth usage using two options:
+
+- Skip Download Test
+- Skip Upload Test
+
+| Configuration                  | Behavior                          |
+|--------------------------------|----------------------------------|
+| None checked                   | Full test (download + upload)    |
+| Skip Upload                    | Download only                    |
+| Skip Download                  | Upload only                      |
+| Skip Download + Skip Upload    | Checker mode (no data usage)     |
+
+Checker mode performs:
+- ISP detection
+- Best server selection
+- Ping measurement
 
 ---
 
 ## Requirements
 
 ### Windows (Recommended)
+
 - Download `speedtest_trigger_gui.exe` from the Releases page
 - Run the application
 
@@ -102,7 +133,8 @@ dist/speedtest_trigger_gui
 - Retrieves current ISP information
 - Selects the best nearby server
 - Measures latency (ping)
-- Updates the interface
+- Optionally performs download and/or upload tests
+- Updates the interface with results
 - Waits for the configured interval
 - Repeats
 
@@ -110,9 +142,10 @@ dist/speedtest_trigger_gui
 
 ## Notes
 
-- This tool does not perform full speed tests
-- Minimal bandwidth usage compared to traditional speedtest tools
+- Download and upload tests are configurable to control data usage
+- Checker mode uses minimal bandwidth
 - Recommended interval: 15–30 seconds
+- Consistent server selection improves reliability for ISP behavior
 
 ---
 

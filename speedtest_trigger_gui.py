@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import ttk
 
 APP_NAME = "Speedtest Trigger"
-APP_VERSION = "v1.0.1"
+APP_VERSION = "v1.0.2"
 
 
 def resource_path(filename):
@@ -39,7 +39,7 @@ class SpeedtestGUI:
     def __init__(self, root):
         self.root = root
         self.root.title(f"{APP_NAME} {APP_VERSION}")
-        self.root.geometry("560x330")
+        self.root.geometry("620x520")
         self.root.resizable(False, False)
 
         self.process = None
@@ -50,13 +50,22 @@ class SpeedtestGUI:
         self.telco_var = tk.StringVar(value="-")
         self.server_var = tk.StringVar(value="-")
         self.ping_var = tk.StringVar(value="-")
+        self.mode_var = tk.StringVar(value="-")
+        self.download_var = tk.StringVar(value="-")
+        self.upload_var = tk.StringVar(value="-")
+        self.result_var = tk.StringVar(value="-")
         self.interval_var = tk.StringVar(value="30")
+
+        self.no_download_var = tk.BooleanVar(value=False)
+        self.no_upload_var = tk.BooleanVar(value=True)
 
         container = ttk.Frame(root, padding=16)
         container.pack(fill="both", expand=True)
 
         title = ttk.Label(
-            container, text=f"{APP_NAME} {APP_VERSION}", font=("Arial", 14, "bold")
+            container,
+            text=f"{APP_NAME} {APP_VERSION}",
+            font=("Arial", 14, "bold"),
         )
         title.pack(anchor="w", pady=(0, 12))
 
@@ -67,27 +76,55 @@ class SpeedtestGUI:
         self.add_row(grid, 1, "Current ISP", self.telco_var)
         self.add_row(grid, 2, "Best Server", self.server_var)
         self.add_row(grid, 3, "Ping", self.ping_var)
+        self.add_row(grid, 4, "Mode", self.mode_var)
+        self.add_row(grid, 5, "Download", self.download_var)
+        self.add_row(grid, 6, "Upload", self.upload_var)
+        self.add_row(grid, 7, "Result", self.result_var)
 
         interval_frame = ttk.Frame(container)
-        interval_frame.pack(fill="x", pady=(0, 12))
+        interval_frame.pack(fill="x", pady=(0, 10))
 
         ttk.Label(interval_frame, text="Loop every (sec):").pack(side="left")
         self.interval_entry = ttk.Entry(
-            interval_frame, textvariable=self.interval_var, width=8
+            interval_frame,
+            textvariable=self.interval_var,
+            width=8,
         )
         self.interval_entry.pack(side="left", padx=(8, 0))
         ttk.Label(interval_frame, text="Example: 30").pack(side="left", padx=(8, 0))
+
+        options_frame = ttk.LabelFrame(container, text="Options", padding=10)
+        options_frame.pack(fill="x", pady=(0, 12))
+
+        self.no_download_chk = ttk.Checkbutton(
+            options_frame,
+            text="Skip Download",
+            variable=self.no_download_var,
+        )
+        self.no_download_chk.pack(side="left", padx=(0, 16))
+
+        self.no_upload_chk = ttk.Checkbutton(
+            options_frame,
+            text="Skip Upload",
+            variable=self.no_upload_var,
+        )
+        self.no_upload_chk.pack(side="left")
 
         btns = ttk.Frame(container)
         btns.pack(fill="x", pady=(8, 8))
 
         self.start_btn = ttk.Button(
-            btns, text="Start Loop", command=self.start_speedtest
+            btns,
+            text="Start Loop",
+            command=self.start_speedtest,
         )
         self.start_btn.pack(side="left", padx=(0, 8))
 
         self.stop_btn = ttk.Button(
-            btns, text="Stop", command=self.stop_speedtest, state="disabled"
+            btns,
+            text="Stop",
+            command=self.stop_speedtest,
+            state="disabled",
         )
         self.stop_btn.pack(side="left")
 
@@ -100,9 +137,17 @@ class SpeedtestGUI:
 
     def add_row(self, parent, row, label, var):
         ttk.Label(parent, text=f"{label}:", width=14).grid(
-            row=row, column=0, sticky="w", pady=4
+            row=row,
+            column=0,
+            sticky="w",
+            pady=4,
         )
-        ttk.Label(parent, textvariable=var).grid(row=row, column=1, sticky="w", pady=4)
+        ttk.Label(parent, textvariable=var).grid(
+            row=row,
+            column=1,
+            sticky="w",
+            pady=4,
+        )
 
     def append_log(self, text):
         self.log.config(state="normal")
@@ -127,6 +172,18 @@ class SpeedtestGUI:
     def set_ping(self, text):
         self.root.after(0, lambda: self.ping_var.set(text))
 
+    def set_mode(self, text):
+        self.root.after(0, lambda: self.mode_var.set(text))
+
+    def set_download(self, text):
+        self.root.after(0, lambda: self.download_var.set(text))
+
+    def set_upload(self, text):
+        self.root.after(0, lambda: self.upload_var.set(text))
+
+    def set_result(self, text):
+        self.root.after(0, lambda: self.result_var.set(text))
+
     def log_line(self, text):
         self.root.after(0, lambda: self.append_log(text))
 
@@ -135,6 +192,8 @@ class SpeedtestGUI:
             self.start_btn.config(state="disabled" if running else "normal")
             self.stop_btn.config(state="normal" if running else "disabled")
             self.interval_entry.config(state="disabled" if running else "normal")
+            self.no_download_chk.config(state="disabled" if running else "normal")
+            self.no_upload_chk.config(state="disabled" if running else "normal")
 
         self.root.after(0, _update)
 
@@ -168,10 +227,30 @@ class SpeedtestGUI:
 
         return kwargs
 
+    def get_mode_label(self):
+        no_download = self.no_download_var.get()
+        no_upload = self.no_upload_var.get()
+
+        if no_download and no_upload:
+            return "Checker mode"
+        if no_download:
+            return "Upload only"
+        if no_upload:
+            return "Download only"
+        return "Full test"
+
     def build_speedtest_cmd(self):
+        extra_args = []
+
+        if self.no_download_var.get():
+            extra_args.append("--no-download")
+        if self.no_upload_var.get():
+            extra_args.append("--no-upload")
+
         if getattr(sys, "frozen", False):
-            return [sys.executable, "--run-speedtest-cli"]
-        return [sys.executable, self.script_path]
+            return [sys.executable, "--run-speedtest-cli", *extra_args]
+
+        return [sys.executable, self.script_path, *extra_args]
 
     def start_speedtest(self):
         if self.running:
@@ -190,6 +269,10 @@ class SpeedtestGUI:
         self.set_telco("-")
         self.set_server("-")
         self.set_ping("-")
+        self.set_mode(self.get_mode_label())
+        self.set_download("-")
+        self.set_upload("-")
+        self.set_result("-")
         self.update_buttons(True)
 
         threading.Thread(target=self.loop_speedtest, daemon=True).start()
@@ -204,6 +287,7 @@ class SpeedtestGUI:
                 pass
 
         self.set_status("Stopped")
+        self.set_result("Stopped")
         self.update_buttons(False)
         self.log_line("Process stopped by user.")
 
@@ -211,7 +295,9 @@ class SpeedtestGUI:
         try:
             while self.running:
                 self.root.after(0, self.clear_log)
-                self.log_line(f"Loop started. Interval: {self.get_interval()}s")
+                self.log_line(
+                    f"Loop started. Interval: {self.get_interval()}s | Mode: {self.get_mode_label()}"
+                )
 
                 result = self.run_speedtest_once()
 
@@ -235,6 +321,7 @@ class SpeedtestGUI:
 
         except Exception as e:
             self.set_status("Retrying...")
+            self.set_result("Retrying soon")
             self.log_line(f"Loop error: {e}")
 
             while self.running:
@@ -250,6 +337,8 @@ class SpeedtestGUI:
             if not os.path.exists(self.script_path):
                 raise FileNotFoundError("speedtest.py not found")
 
+            mode_label = self.get_mode_label()
+            self.set_mode(mode_label)
             self.set_status("Checking ISP and best server...")
 
             self.process = subprocess.Popen(
@@ -291,6 +380,34 @@ class SpeedtestGUI:
                     self.set_status("Ping detected")
                     found_ping = True
 
+                elif line.startswith("Mode: CHECKER"):
+                    self.set_mode("Checker mode")
+                    self.set_download("Skipped")
+                    self.set_upload("Skipped")
+                    self.set_result("Checker only")
+                    self.set_status("Checker mode")
+
+                elif line.startswith("Download Test:"):
+                    value = line.replace("Download Test:", "", 1).strip()
+                    self.set_download(value)
+
+                    if "SKIPPED" not in value.upper():
+                        self.set_result("Download completed")
+
+                elif line.startswith("Upload Test:"):
+                    value = line.replace("Upload Test:", "", 1).strip()
+                    self.set_upload(value)
+
+                    if "SKIPPED" not in value.upper():
+                        current_download = self.download_var.get().strip().lower()
+                        if current_download and current_download not in (
+                            "-",
+                            "skipped",
+                        ):
+                            self.set_result("Download + Upload completed")
+                        else:
+                            self.set_result("Upload completed")
+
             if self.process:
                 self.process.wait(timeout=5)
 
@@ -319,6 +436,7 @@ class SpeedtestGUI:
                     for marker in retryable_markers
                 ):
                     self.set_status("Rate limited / retrying")
+                    self.set_result("Retrying soon")
                     self.log_line(
                         "Temporary speedtest error detected. Retrying in 5 seconds..."
                     )
@@ -329,10 +447,24 @@ class SpeedtestGUI:
                 )
 
             if found_isp or found_server or found_ping:
+                if self.no_download_var.get() and self.no_upload_var.get():
+                    self.set_result("Checker only")
+                    self.set_download("Skipped")
+                    self.set_upload("Skipped")
+                elif self.no_download_var.get() and not self.no_upload_var.get():
+                    self.set_result("Upload completed")
+                    self.set_download("Skipped")
+                elif not self.no_download_var.get() and self.no_upload_var.get():
+                    self.set_result("Download completed")
+                    self.set_upload("Skipped")
+                else:
+                    self.set_result("Download + Upload completed")
+
                 self.set_status("Updated")
                 return "ok"
 
             self.set_status("No data")
+            self.set_result("Retrying soon")
             self.log_line(
                 "No ISP/server/ping output detected. Retrying in 5 seconds..."
             )
@@ -342,17 +474,20 @@ class SpeedtestGUI:
             self.running = False
             self.update_buttons(False)
             self.set_status("Missing speedtest.py")
+            self.set_result("Missing speedtest.py")
             self.log_line("Error: bundled speedtest.py not found.")
             return "fatal"
 
         except Exception as e:
             if self.running:
                 self.set_status("Retrying...")
+                self.set_result("Retrying soon")
                 self.log_line(f"Error: {e}")
                 self.log_line("Retrying in 5 seconds...")
                 return "retry_soon"
 
             self.set_status("Stopped")
+            self.set_result("Stopped")
             return "stopped"
 
     def on_close(self):
