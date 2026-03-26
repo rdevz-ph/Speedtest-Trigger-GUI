@@ -3,7 +3,10 @@
 A lightweight desktop tool designed to help maintain stable internet performance by periodically running controlled speed test triggers or lightweight connection checks.
 
 > [!NOTE]
-> This tool helps maintain your internet speed at its peak, especially in cases where performance drops when no active traffic or speed test is detected (common with ISP throttling behavior).
+> This tool helps maintain your internet speed at its peak, especially in cases where performance drops when no active traffic or speed test is detected (common with ISP throttling behavior).  
+>
+> An Android version is also available:  
+> https://github.com/rdevz-ph/SpeedtestTriggerAndroid
 
 Built with Python and Tkinter, it serves as a lightweight alternative to running Speedtest in a web browser while giving you control over bandwidth usage.
 
